@@ -1,7 +1,6 @@
 import type { AppConfig } from "./lib/edge/types.ts";
 
-import { prompt } from "./prompts/movie-critic.ts";
-// import { prompt } from "./prompts/tour-guide.ts";
+import { prompt } from "./prompts/symptom-assessment.ts";
 
 export const appConfig: AppConfig = {
   // This should be set in an environment variable
@@ -27,7 +26,7 @@ export const appConfig: AppConfig = {
   // This can be a plain string if you'd prefer, or you can use
   // information from the request or context to generate it.
   systemPrompt: (_req, context) => `${prompt}
-Respond with valid markdown. Put movie names in bold. Knowledge cutoff September 2021.
+Respond with valid markdown. Put types of doctors in bold. Knowledge cutoff September 2021.
 Current date: ${new Date().toDateString()}.
 User location: ${context.geo.city}, ${context.geo.country}`,
 };
