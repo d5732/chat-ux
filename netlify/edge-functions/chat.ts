@@ -9,6 +9,12 @@ if (!appConfig.OPENAI_API_KEY || !appConfig.systemPrompt) {
   );
 }
 
+if (appConfig.OPENAI_API_KEY) {
+  console.log(appConfig.OPENAI_API_KEY.slice(0, 7));
+} else {
+  console.error("missing API key");
+}
+
 export default async function handler(
   request: Request,
   context: Context

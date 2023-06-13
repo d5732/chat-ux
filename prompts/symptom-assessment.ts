@@ -15,45 +15,88 @@ After each message you receive, check if the following JSON schema can be comple
   "description": "This document records the summarized details from a patient's conversation with the chatbot",
   "type": "object",
   "properties": {
-      "id": {
-          "description": "A unique identifier for this conversation",
+    "id": {
+      "description": "A unique identifier for this conversation",
+      "type": "string",
+      "format": "uuid"
+    },
+    "patient_id": {
+      "description": "A unique identifier for this patient",
+      "type": "string",
+      "format": "uuid"
+    },
+    "name": {
+      "description": "Full name of the patient",
+      "type": "string",
+      "minLength": 2
+    },
+    "location": {
+      "description": "Location of the patient",
+      "type": "object",
+      "properties": {
+        "city": {
           "type": "string"
-      },
-      "patient_id": {
-          "description": "A unique identifier for this patient",
+        },
+        "state": {
           "type": "string"
-      },
-      "name": {
-          "description": "Full name of the patient",
+        },
+        "country": {
           "type": "string"
-          "minLength": 2
-      },
-      "age": {
-          "description": "Age of the patient",
-          "type": "number",
-      },
-      "symptoms": {
-          "description": "List of symptoms",
-          "type": "array",
-          "items": {
-              "type": "string"
-          }
-      }, 
-      "health_history": {
-        "description": "List of noteworthy historical health conditions",
-        "type": "array",
-        "items": {
-            "type": "string"
         }
+      },
+      "required": ["city", "state", "country"]
+    },
+    "age": {
+      "description": "Age of the patient",
+      "type": "number"
+    },
+    "symptoms": {
+      "description": "List of symptoms",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "symptoms_duration": {
+      "description": "Amount of time the patient has been experiencing these symptoms, measured in hours",
+      "type": "number"
+    },
+    "symptoms_frequency": {
+      "description": "How often the symptoms are present for the patient",
+      "type": "string",
+      "enum": ["rarely", "sometimes", "often", "always"]
+    },
+    "health_history": {
+      "description": "List of noteworthy historical health conditions",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "dietary_preferences": {
+      "description": "List of dietary preferences of the patient",
+      "type": "string"
+    },
+    "alcohol_use": {
+      "description": "Frequency of alcohol use, with the possible values of never, sometimes, often",
+      "type": "string",
+      "enum": ["never", "sometimes", "often"]
+    },
+    "tobacco_use": {
+      "description": "Frequency of tobacco use, with the possible values of never, sometimes, often",
+      "type": "string",
+      "enum": ["never", "sometimes", "often"]
     }
   },
   "required": [
-      "id"  
-      "patient_id",
-      "name",
-      "age",
-      "symptoms",
-      "health_history"
+    "id",
+    "patient_id",
+    "name",
+    "age",
+    "symptoms",
+    "health_history",
+    "alcohol_use",
+    "tobacco_use"
   ]
 }`;
 
