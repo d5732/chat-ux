@@ -1,116 +1,136 @@
-import { fetchEventSource } from "@fortaine/fetch-event-source";
-import { useState, useMemo } from "react";
-import { appConfig } from "../../config.browser";
+import { useState } from "react";
+import { PromptMapping, prompts } from "../../prompts/static-prompts";
+import uuid4 from "uuid4";
 
-const API_PATH = "/api/chat";
-interface ChatMessage {
+const EDGE_API_PATH = "/api/remote-database/conversation";
+type ChatMessage = {
   role: "user" | "assistant";
   content: string;
-}
+  mapsTo?: PromptMapping;
+};
+
+type Payload = {
+  patient: {
+    id: string;
+    location: null | { latitude: number; longitude: number; accuracy: number };
+  };
+  conversation: { id: string; answers: Answers };
+};
+
+type Answers = {
+  answers: {
+    [K in PromptMapping]: string;
+  };
+};
+
+const edgePost = async (payload: Payload) => {
+  console.log({ payload });
+  const body = JSON.stringify(payload);
+
+  // Edge API forwards requests after appending remote database API key
+  try {
+    const response = await fetch(EDGE_API_PATH, {
+      body,
+      method: "POST",
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+  } catch (e) {
+    console.error(e);
+  }
+};
+
+const reduceChatHistoryToAnswers = (chatHistory: ChatMessage[]) =>
+  chatHistory.reduce(
+    (acc, { role, content, mapsTo: field }) => {
+      if (role === "user" && field) {
+        acc.answers[field] = content;
+      }
+      return acc;
+    },
+    { answers: {} } as Answers
+  );
 
 /**
  * A custom hook to handle the chat state and logic
+ * Builds a payload after the final prompt
  */
 export function useChat() {
-  const [currentChat, setCurrentChat] = useState<string | null>(null);
+  const [chat, setChat] = useState<string | null>(null);
   const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);
-  const [state, setState] = useState<"idle" | "waiting" | "loading">("idle");
-
-  // Lets us cancel the stream
-  const abortController = useMemo(() => new AbortController(), []);
-
-  /**
-   * Cancels the current chat and adds the current chat to the history
-   */
-  function cancel() {
-    setState("idle");
-    abortController.abort();
-    if (currentChat) {
-      const newHistory = [
-        ...chatHistory,
-        { role: "user", content: currentChat } as const,
-      ];
-
-      setChatHistory(newHistory);
-      setCurrentChat("");
-    }
-  }
-
-  /**
-   * Clears the chat history
-   */
-
-  function clear() {
-    console.log("clear");
-    setChatHistory([]);
-  }
-
-  /**
-   * Sends a new message to the AI function and streams the response
-   */
-  const sendMessage = (message: string, chatHistory: Array<ChatMessage>) => {
-    setState("waiting");
-    let chatContent = "";
-    const newHistory = [
-      ...chatHistory,
-      { role: "user", content: message } as const,
-    ];
-
-    setChatHistory(newHistory);
-    const body = JSON.stringify({
-      // Only send the most recent messages. This is also
-      // done in the serverless function, but we do it here
-      // to avoid sending too much data
-      messages: newHistory.slice(-appConfig.historyLength),
-    });
-
-    // This is like an EventSource, but allows things like
-    // POST requests and headers
-    fetchEventSource(API_PATH, {
-      body,
-      method: "POST",
-      signal: abortController.signal,
-      onclose: () => {
-        setState("idle");
-      },
-      onmessage: (event) => {
-        switch (event.event) {
-          case "delta": {
-            // This is a new word or chunk from the AI
-            setState("loading");
-            const message = JSON.parse(event.data);
-            if (message?.role === "assistant") {
-              chatContent = "";
-              return;
-            }
-            if (message.content) {
-              chatContent += message.content;
-              setCurrentChat(chatContent);
-            }
-            break;
-          }
-          case "open": {
-            // The stream has opened and we should recieve
-            // a delta event soon. This is normally almost instant.
-            setCurrentChat("...");
-            break;
-          }
-          case "done": {
-            // When it's done, we add the message to the history
-            // and reset the current chat
-            setChatHistory((curr) => [
-              ...curr,
-              { role: "assistant", content: chatContent } as const,
-            ]);
-            setCurrentChat(null);
-            setState("idle");
-          }
-          default:
-            break;
-        }
-      },
-    });
+  const [currentPromptIndex, setCurrentPromptIndex] = useState<number>(0);
+  const [completed, setCompleted] = useState<boolean>();
+  const getNextPrompt = () => {
+    const prompt = prompts[currentPromptIndex + 1];
+    setCurrentPromptIndex((prev) => prev + 1);
+    return prompt;
   };
 
-  return { sendMessage, currentChat, chatHistory, cancel, clear, state };
+  const sendMessage = (message: string) => {
+    const currentMapsTo = prompts[currentPromptIndex]?.mapsTo;
+    const nextPrompt = getNextPrompt();
+
+    setChatHistory((curr) => {
+      const newHistory = [
+        ...curr,
+        {
+          role: "user",
+          content: message,
+          mapsTo: currentMapsTo,
+        } as ChatMessage,
+      ];
+
+      if (!nextPrompt) {
+        newHistory.push({
+          role: "assistant",
+          content: "Data is being sent to the backend",
+        });
+
+        // TODO: Null location fallback to edge context location
+        let location = null;
+        navigator.geolocation.getCurrentPosition(
+          ({ coords }) => {
+            const { longitude, latitude, accuracy } = coords;
+            location = { longitude, latitude, accuracy };
+          },
+          () => {},
+          { timeout: 15000 }
+        );
+
+        const conversation = {
+          id: localStorage.getItem("conversationId") || uuid4(),
+          answers: reduceChatHistoryToAnswers(chatHistory),
+        };
+
+        console.log({ location });
+
+        const payload: Payload = {
+          conversation,
+          patient: { id: localStorage.getItem("userId") || uuid4(), location },
+        };
+        setCompleted(true);
+        edgePost(payload);
+      } else {
+        newHistory.push({
+          role: "assistant",
+          content: nextPrompt.question,
+        });
+      }
+
+      return newHistory;
+    });
+
+    setChat(null);
+  };
+
+  return {
+    sendMessage,
+    chat,
+    chatHistory,
+    completed,
+  };
 }
