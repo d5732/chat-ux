@@ -62,11 +62,6 @@ After each message you receive, check if the following JSON schema can be comple
       "description": "Amount of time the patient has been experiencing these symptoms, measured in hours",
       "type": "number"
     },
-    "symptoms_frequency": {
-      "description": "How often the symptoms are present for the patient",
-      "type": "string",
-      "enum": ["rarely", "sometimes", "often", "always"]
-    },
     "health_history": {
       "description": "List of noteworthy historical health conditions",
       "type": "array",
