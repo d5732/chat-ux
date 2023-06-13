@@ -9,38 +9,27 @@ if (!appConfig.REMOTE_DATABASE_API_KEY || !appConfig.REMOTE_DATABASE_API_URL) {
 export default async function handler(
   request: Request,
   context: Context
-): Promise<Response> {
+): Promise<void /* Response */> {
   try {
     const data = await request.json();
 
-    
-      {
-        // Optional. This can also be set to a real user id, session id or leave blank.
-        // See https://platform.openai.com/docs/guides/safety-best-practices/end-user-ids
-        user: context.ip,
-        messages: [
-          {
-            role: "system",
-            content: prompt,
-          },
-          ...messages,
-        ],
-      },
-      appConfig.OPENAI_API_KEY ?? ""
-    );
-    return new Response(stream, {
-      headers: {
-        "Content-Type": "text/event-stream",
-      },
-    });
+    data.token = "Bearer " + appConfig.REMOTE_DATABASE_API_KEY ?? "";
+
+    // await fetch(appConfig.REMOTE_DATABASE_API_URL, {
+    //   headers: {
+    //     "Content-Type": "text/plain",
+    //   },
+    //   body: data,
+    //   method: "POST",
+    // });
   } catch (e) {
     console.error(e);
-    return new Response(e.message, {
-      status: 500,
-      headers: {
-        "Content-Type": "text/plain",
-      },
-    });
+    // return new Response(e.message, {
+    //   status: 500,
+    //   headers: {
+    //     "Content-Type": "text/plain",
+    //   },
+    // });
   }
 }
 
