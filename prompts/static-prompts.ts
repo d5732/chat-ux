@@ -32,7 +32,7 @@ export const prompts: Prompt[] = [
     mapsTo: PromptMapping.AGE,
   },
   {
-    question: "What are your dietary preferences?",
+    question: "Which option best matches your diet: omnivore, vegetarian, or vegan?",
     mapsTo: PromptMapping.DIETARY_PREFERENCES,
   },
   {
