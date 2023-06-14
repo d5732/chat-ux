@@ -1,6 +1,6 @@
 import type { Config, Context } from "https://edge.netlify.com/";
 
-import { appConfig } from "../../config.edge.js";
+import { appConfig } from "../../config.edge.ts";
 
 if (!appConfig.REMOTE_DATABASE_API_KEY || !appConfig.REMOTE_DATABASE_API_URL) {
   throw new Error("REMOTE_DATABASE_API_KEY must be set in config.edge.ts");
