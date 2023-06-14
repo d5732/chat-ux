@@ -7,8 +7,10 @@ const GeolocationComponent: React.FC<{
 }> = ({ setGeolocationPosition }) => {
   useEffect(() => {
     if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition((geolocationPosition) => {
-        setGeolocationPosition(geolocationPosition);
+      navigator.geolocation.getCurrentPosition((position) => {
+        const { latitude, longitude } = position.coords;
+        localStorage.setItem("location.latitude", String(latitude) );
+        localStorage.setItem("location.longitude", String(longitude) );
       });
     }
   }, []);

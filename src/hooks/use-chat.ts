@@ -90,27 +90,18 @@ export function useChat() {
           content: "Data is being sent to the backend",
         });
 
-        // TODO: Null location fallback to edge context location
-        let location = null;
-        navigator.geolocation.getCurrentPosition(
-          ({ coords }) => {
-            const { longitude, latitude, accuracy } = coords;
-            location = { longitude, latitude, accuracy };
-          },
-          () => {},
-          { timeout: 15000 }
-        );
-
         const conversation = {
           id: localStorage.getItem("conversationId") || uuid4(),
           answers: reduceChatHistoryToAnswers(chatHistory),
         };
 
-        console.log({ location });
-
         const payload: Payload = {
           conversation,
-          patient: { id: localStorage.getItem("userId") || uuid4(), location },
+          patient: {
+            id: localStorage.getItem("userId") || uuid4(), location: {
+              latitude: Number(localStorage.getItem("latitude")),
+              longitude: Number(localStorage.getItem("longitude")),
+          } },
         };
         setCompleted(true);
         edgePost(payload);
