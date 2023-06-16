@@ -1,14 +1,9 @@
-import { useState, useMemo, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { App } from "../App";
 import { useChat } from "../hooks/use-chat";
 import { ChatMessage } from "../components/ChatMessage";
 import { Welcome } from "../components/Welcome";
 import GeolocationComponent from "../components/GeolocationComponent";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { auth, authenticateWithEmail } from "../firebase";
-import { User } from "firebase/auth";
-import Signin from "../components/auth/Signin";
-import DoctorLookup from "./doctor-lookup";
 
 export default function Index() {
   // The content of the box where the user is typing
@@ -39,47 +34,9 @@ export default function Index() {
     inputRef.current?.focus();
   };
 
-  const [user, setUser] = useState<User | null>(null);
-
-  useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      if (user) {
-        setUser(user);
-      } else {
-        setUser(null);
-      }
-    });
-
-    return () => unsubscribe();
-  }, []);
-
-  const handleLogin = () => {
-    // TODO: Add email input
-    authenticateWithEmail("movetojunk@gmail.com");
-    window.localStorage.setItem("emailForSignIn", "movetojunk@gmail.com");
-  };
-
-  const handleLogout = () => {
-    auth.signOut();
-  };
-
   return (
     <App title="Find a doctor with the help of AI">
-      <div>
-        <header>
-          <h1>Expense Tracker</h1>
-          {user ? (
-            <button onClick={handleLogout}>Logout</button>
-          ) : (
-            <button onClick={handleLogin}>Login</button>
-          )}
-        </header>
-        <a href="/">Sign in</a>
-        <a href="/signup">Sign up</a>
-        <a href="/doctor-lookup">Doctor Lookup</a>
-      </div>
-
-      {/* <main className="bg-white md:rounded-lg md:shadow-md p-6 w-full h-full flex flex-col">
+      <main className="bg-white md:rounded-lg md:shadow-md p-6 w-full h-full flex flex-col">
         <section className="overflow-y-auto flex-grow mb-4 pb-8">
           <div className="flex flex-col space-y-4">
             {chatHistory.length === 0 ? (
@@ -133,7 +90,7 @@ export default function Index() {
           </form>
         </section>
       </main>
-      <GeolocationComponent setGeolocationPosition={setGeolocationPosition} /> */}
+      <GeolocationComponent setGeolocationPosition={setGeolocationPosition} />
     </App>
   );
 }
