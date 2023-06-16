@@ -16,9 +16,12 @@
     "@impalajs/core": "*",
     "@impalajs/react": "*",
     "@types/uuid4": "^2.0.0",
+    "firebase": "^9.22.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-firebase-hooks": "^5.1.1",
     "react-markdown": "^8.0.6",
+    "react-router-dom": "^6.13.0",
     "remark-gfm": "^3.0.1",
     "uuid4": "^2.0.3"
   },

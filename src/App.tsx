@@ -17,6 +17,11 @@ export const App: React.FC<React.PropsWithChildren<AppProps>> = ({
         <meta name="description" content="Find a doctor with the help of AI" />
       </Head>
       {children}
+      {/* <Routes>
+        <Route exact path="/" element={<Signin />} />
+        <Route path="/home" element={<div>About</div>} />
+
+      </Routes> */}
     </>
   );
 };
