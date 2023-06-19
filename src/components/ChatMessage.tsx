@@ -38,17 +38,17 @@ const CustomTable: FunctionComponent<
  */
 
 export const ChatMessage: React.FC<React.PropsWithChildren<Props>> = ({
-  message,
-}) =>
+    message,
+  }) =>
   message.role === "user" ? (
-    <div className="flex items-end justify-end">
-      <div className="bg-gray-300 border-gray-100 border-2 rounded-lg p-2 max-w-lg">
+    <div className="flex items-start justify-end min-w-[60vw] w-full px-3">
+      <div className="bg-gray-300 border-gray-100 border-2 rounded-lg p-2 max-w-lg pr-3">
         <p>{message.content}</p>
       </div>
     </div>
   ) : (
     <div className="flex items-end">
-      <div className="bg-gray-100 border-gray-300 border-2 rounded-lg p-2 mr-20 w-full">
+      <div className="bg-gray-100 border-gray-300 border-2 rounded-lg p-2 mr-20 w-full max-w-lg">
         <ReactMarkdown
           children={message.content}
           remarkPlugins={[remarkGfm]}
@@ -59,3 +59,4 @@ export const ChatMessage: React.FC<React.PropsWithChildren<Props>> = ({
       </div>
     </div>
   );
+
