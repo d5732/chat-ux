@@ -2,7 +2,6 @@ import { useState, useEffect, useRef } from "react";
 import { App } from "../App";
 import { useChat } from "../hooks/use-chat";
 import { ChatMessage } from "../components/ChatMessage";
-import { Welcome } from "../components/Welcome";
 import GeolocationComponent from "../components/GeolocationComponent";
 
 export default function Index() {
@@ -34,33 +33,15 @@ export default function Index() {
 
   return (
     <App title="Find a doctor with the help of AI">
-      <main className="bg-white md:rounded-lg md:shadow-md p-6 w-full h-full flex flex-col">
+      <main className="bg-white md:rounded-lg md:shadow-md pt-6 px-6 w-full h-full flex flex-col">
         <section className="overflow-y-auto flex-grow mb-4 pb-8">
           <div className="flex flex-col space-y-4">
-            {chatHistory.length === 0 ? (
-              <>
-                <Welcome />
-                <div className="flex justify-center">
-                  <p className="text-sm text-gray-500 mt-5">
-                    Built by 🤖{" "}
-                    <a
-                      className="underline"
-                      href="https://github.com/d5732/chat-ux"
-                    >
-                      Snack Dandies
-                    </a>
-                  </p>
-                </div>
-              </>
-            ) : (
-              chatHistory.map((chat, i) => (
-                <ChatMessage key={i} message={chat} />
-              ))
-            )}
+            {chatHistory?.map((chat, i) => (
+              <ChatMessage key={i} message={chat} />
+            ))}
           </div>
           <div ref={bottomRef} />
         </section>
-
         <section className="bg-gray-100 rounded-lg p-2">
           <form
             className="flex"
@@ -86,7 +67,15 @@ export default function Index() {
               Send
             </button>
           </form>
-        </section>
+        </section>{" "}
+        <div className="flex justify-center">
+          <p className="text-sm text-gray-500 my-2">
+            Built by 🤖{" "}
+            <a className="underline" href="https://github.com/d5732/chat-ux">
+              Snack Dandies
+            </a>
+          </p>
+        </div>
       </main>
       <GeolocationComponent />
     </App>

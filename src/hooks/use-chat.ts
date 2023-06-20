@@ -1,5 +1,5 @@
 import { Recomendations, Result } from "../types/recommendations.types";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { PromptMapping, prompts } from "../../prompts/static-prompts";
 import uuid4 from "uuid4";
 
@@ -69,6 +69,16 @@ const getMapsUrl = ({ vicinity, name, geometry }: Partial<Result>) => {
   return `[Open with Google Maps](https://www.google.com/maps/dir//${vicinity}+${name}/@${lat},${lng})`;
 };
 
+const handleUserId = () => {
+  if (!localStorage.getItem("user_id")) {
+    localStorage.setItem("user_id", uuid4());
+  }
+};
+
+const handleConversationId = () => {
+  localStorage.setItem("conversation_id", uuid4());
+};
+
 /**
  * A custom hook to handle the chat state and logic
  * Builds a payload after the final prompt
@@ -76,10 +86,21 @@ const getMapsUrl = ({ vicinity, name, geometry }: Partial<Result>) => {
 export function useChat() {
   const [apiError, setApiError] = useState<string>();
   const [chat, setChat] = useState<string | null>(null);
-  const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);
+  const [chatHistory, setChatHistory] = useState<ChatMessage[]>([
+    {
+      role: "assistant",
+      content:
+        "🤖 Hello, I am Maria.\nI will help you find the right type of doctor to help with your symptoms. Please tell me about the symptoms you are experiencing.",
+    },
+  ]);
   const [currentPromptIndex, setCurrentPromptIndex] = useState<number>(0);
   const [conversationIsCompleted, setConversationIsCompleted] =
     useState<boolean>();
+
+  useEffect(() => {
+    handleUserId();
+    handleConversationId();
+  }, []);
 
   const getRecommendations = async (payload: { payload: Payload }) => {
     try {
