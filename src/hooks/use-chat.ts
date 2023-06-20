@@ -31,100 +31,20 @@ const edgePost = async (payload: { payload: Payload }) => {
 
   // Edge API enriches and forwards requests to Snack Dandies back end
   // i.e. append private remote database API token
-  // TODO: uncomment to unmock
-  // const response = await fetch(EDGE_API_PATH, {
-  //   body,
-  //   method: "POST",
-  // });
+  const response = await fetch(EDGE_API_PATH, {
+    body,
+    method: "POST",
+  });
 
-  // if (!response.ok) {
-  //   throw new Error(`HTTP error! status: ${response.status}`);
-  // }
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
 
-  // const data = await response.json();
-  const mockData: Recomendations = {
-    html_attributions: [],
-    results: [
-      {
-        business_status: "OPERATIONAL",
-        geometry: {
-          location: {
-            lat: -33.8670835,
-            lng: 151.2120446,
-          },
-          viewport: {
-            northeast: {
-              lat: -33.86574787010728,
-              lng: 151.2135504798927,
-            },
-            southwest: {
-              lat: -33.86844752989272,
-              lng: 151.2108508201073,
-            },
-          },
-        },
-        icon: "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/generic_business-71.png",
-        icon_background_color: "#7B9EB0",
-        icon_mask_base_uri:
-          "https://maps.gstatic.com/mapfiles/place_api/icons/v2/generic_pinlet",
-        name: "Dr Browne Christopher D",
-        opening_hours: {},
-        place_id: "ChIJ74qT9mquEmsR9qB-YzWzGyY",
-        plus_code: {
-          compound_code: "46M6+5R Sydney, New South Wales",
-          global_code: "4RRH46M6+5R",
-        },
-        rating: 4.1,
-        reference: "ChIJ74qT9mquEmsR9qB-YzWzGyY",
-        scope: "GOOGLE",
-        types: ["doctor", "point_of_interest", "health", "establishment"],
-        user_ratings_total: 9,
-        vicinity: "193 Macquarie St, Sydney",
-      },
-      {
-        business_status: "OPERATIONAL",
-        geometry: {
-          location: {
-            lat: -33.8762429,
-            lng: 151.2125209,
-          },
-          viewport: {
-            northeast: {
-              lat: -33.87478277010727,
-              lng: 151.2137371798927,
-            },
-            southwest: {
-              lat: -33.87748242989272,
-              lng: 151.2110375201072,
-            },
-          },
-        },
-        icon: "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/generic_business-71.png",
-        icon_background_color: "#7B9EB0",
-        icon_mask_base_uri:
-          "https://maps.gstatic.com/mapfiles/place_api/icons/v2/generic_pinlet",
-        name: "Dr Gemma Winkler",
-        opening_hours: {
-          open_now: true,
-        },
-        place_id: "ChIJ5ffiNsOvEmsRLhz6U0Jc2wA",
-        plus_code: {
-          compound_code: "46F7+G2 Darlinghurst, New South Wales",
-          global_code: "4RRH46F7+G2",
-        },
-        rating: 5,
-        reference: "ChIJ5ffiNsOvEmsRLhz6U0Jc2wA",
-        scope: "GOOGLE",
-        types: ["doctor", "point_of_interest", "health", "establishment"],
-        user_ratings_total: 2,
-        vicinity: "Suite 1, Level 7/26 College St, Darlinghurst",
-      },
-    ],
-    status: "OK",
-  };
+  const data = await response.json();
 
-  console.log({ mockData });
-  return mockData;
+  console.log({ data });
+  debugger;
+  return data;
 };
 
 const reduceChatHistoryToAnswers = (chatHistory: ChatMessage[]) =>
@@ -137,6 +57,12 @@ const reduceChatHistoryToAnswers = (chatHistory: ChatMessage[]) =>
     },
     { answers: {} } as Answers
   );
+
+const getMapsUrl = ({ vicinity, name, geometry }: Partial<Result>) => {
+  const { lat, lng } = geometry!.location;
+  [vicinity, name] = [vicinity, name].map((x) => x!.replaceAll(" ", "+"));
+  return `[Open with Google Maps](https://www.google.com/maps/dir//${vicinity}+${name}/@${lat},${lng})`;
+};
 
 /**
  * A custom hook to handle the chat state and logic
@@ -159,7 +85,7 @@ export function useChat() {
       setApiError(
         typeof (e as any)?.message === "string"
           ? (e as any).message
-          : "There was an error during recommendations service request."
+          : "There was an error while requesting recommendations from the server."
       );
     }
   };
@@ -168,12 +94,6 @@ export function useChat() {
     const prompt = prompts[currentPromptIndex + 1];
     setCurrentPromptIndex((prev) => prev + 1);
     return prompt;
-  };
-
-  const getMapsUrl = ({ vicinity, name, geometry }: Partial<Result>) => {
-    const { lat, lng } = geometry!.location;
-    [vicinity, name] = [vicinity, name].map((x) => x!.replaceAll(" ", "+"));
-    return `[Open with Google Maps](https://www.google.com/maps/dir//${vicinity}+${name}/@${lat},${lng})`;
   };
 
   const showRecommendationsAsChatMessage = (
@@ -257,5 +177,6 @@ export function useChat() {
     chat,
     chatHistory,
     conversationIsCompleted,
+    apiError,
   };
 }
