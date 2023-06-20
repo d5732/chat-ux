@@ -11,7 +11,7 @@ export default function Index() {
 
   // This hook is responsible for managing the chat and communicating with the
   // backend
-  const { chat, chatHistory, sendMessage, completed } = useChat();
+  const { chat, chatHistory, sendMessage, conversationIsCompleted } = useChat();
 
   // This is a ref to the bottom of the chat history. We use it to scroll
   // to the bottom when a new message is added.
@@ -81,7 +81,7 @@ export default function Index() {
             <button
               className="bg-blue-700 text-white font-bold py-2 px-4 rounded-r-lg"
               type="submit"
-              disabled={!message || !!completed}
+              disabled={!message || !!conversationIsCompleted}
             >
               Send
             </button>
