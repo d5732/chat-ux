@@ -1,7 +1,7 @@
-import React, { useState, useMemo, useEffect, useRef, FormEvent } from 'react'
+import { useState, useEffect, FormEvent } from 'react'
 import { auth, authenticateWithEmail } from '../firebase';
-import { User, isSignInWithEmailLink, sendSignInLinkToEmail, signInWithEmailLink } from "firebase/auth";
-import { Button, Col, Container, Form, FormGroup, FormLabel, Row, Spinner } from 'react-bootstrap';
+import { isSignInWithEmailLink, signInWithEmailLink } from "firebase/auth";
+import { Container, Form, FormLabel, Spinner } from 'react-bootstrap';
 import { useNavigate, useLocation } from "react-router-dom";
 import jwt_decode from "jwt-decode";
 import { useAuthState } from 'react-firebase-hooks/auth';
@@ -15,12 +15,9 @@ const Signin = () => {
     // });
     const [user] = useAuthState(auth);
     const [useremail, setUseremail] = useState("");
-    const [isLoginButtonDisbaled, setLoginButtonDisbaled] = useState(false);
     const [isLoading, setLoading] = useState(false);
     const [validated, setValidated] = useState(false);
     const [initialError, setInitialError] = useState('');
-    const location = useLocation();
-    const { search } = location;
     const [loginError, setLoginError] = useState('');
     const navigate = useNavigate();
     const [infoMsg, setInfoMsg] = useState('');
@@ -73,13 +70,13 @@ const Signin = () => {
         /* global google */
         const googleAccounts = (window as any).google.accounts;
         googleAccounts.id.initialize({
-            client_id: '',
+            client_id: import.meta.env.VITE_G_CLIENT_ID || '',
             callback: handleCredentialResponse,
         });
 
         googleAccounts.id.renderButton(
             document.getElementById('google-signin-button'),
-            { size: 'large', width: '400px', 'align-content': 'center' }
+            { size: 'large', width: '400px', 'align-content': 'center', backgroundColor: '#E5E7EB' }
         );
 
         if(isSignInWithEmailLink(auth, window.location.href)){
@@ -127,7 +124,7 @@ const Signin = () => {
                                     value={useremail}
                                     onChange={(event) => setUseremail(event.target.value)}
                                 />
-                                <FormLabel className="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white dark:bg-gray-900 px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 left-1"> Email address </FormLabel>
+                                <FormLabel className="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-gray-200 dark:bg-gray-200 px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 left-1"> Email address </FormLabel>
                                 <Form.Control.Feedback type="invalid">
                                     Please provide a valid email.
                                 </Form.Control.Feedback>
