@@ -28,16 +28,17 @@ type Answers = {
 
 const apiPost = async (payload: { payload: Payload }) => {
   console.log(payload);
-  const body = JSON.stringify(payload);
 
-  // Edge API enriches and forwards requests to Snack Dandies back end
-  // i.e. append private remote database API token
+  const headers = new Headers();
+  headers.append("Content-Type", "application/json");
+  headers.append(
+    "Access-Control-Allow-Origin",
+    "https://main--melodic-creponne-ae0f94.netlify.app/"
+  );
   const response = await fetch(API_PATH, {
-    body,
+    body: JSON.stringify(payload),
     method: "POST",
-    headers: {
-      "content-type": "application/json",
-    },
+    headers,
   });
 
   if (!response.ok) {
