@@ -3,7 +3,8 @@ import { useState } from "react";
 import { PromptMapping, prompts } from "../../prompts/static-prompts";
 import uuid4 from "uuid4";
 
-const EDGE_API_PATH = "/api/remote-service";
+const API_PATH =
+  "https://gpt-snack-dandies-lzfxylzina-uc.a.run.app/doctor-category";
 type ChatMessage = {
   role: "user" | "assistant";
   content: string;
@@ -25,15 +26,18 @@ type Answers = {
   };
 };
 
-const edgePost = async (payload: { payload: Payload }) => {
+const apiPost = async (payload: { payload: Payload }) => {
   console.log(payload);
   const body = JSON.stringify(payload);
 
   // Edge API enriches and forwards requests to Snack Dandies back end
   // i.e. append private remote database API token
-  const response = await fetch(EDGE_API_PATH, {
+  const response = await fetch(API_PATH, {
     body,
     method: "POST",
+    headers: {
+      "content-type": "application/json",
+    },
   });
 
   if (!response.ok) {
@@ -78,7 +82,7 @@ export function useChat() {
 
   const getRecommendations = async (payload: { payload: Payload }) => {
     try {
-      const result = await edgePost(payload);
+      const result = await apiPost(payload);
       showRecommendationsAsChatMessage(result);
     } catch (e) {
       console.error(e);
