@@ -1,16 +1,12 @@
-import React, { Dispatch, SetStateAction, useEffect } from "react";
+import React, { useEffect } from "react";
 
-const GeolocationComponent: React.FC<{
-  setGeolocationPosition: Dispatch<
-    SetStateAction<GeolocationPosition | undefined>
-  >;
-}> = ({ setGeolocationPosition }) => {
+const GeolocationComponent: React.FC = () => {
   useEffect(() => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition((position) => {
         const { latitude, longitude } = position.coords;
-        localStorage.setItem("location.latitude", String(latitude) );
-        localStorage.setItem("location.longitude", String(longitude) );
+        localStorage.setItem("location.latitude", String(latitude));
+        localStorage.setItem("location.longitude", String(longitude));
       });
     }
   }, []);

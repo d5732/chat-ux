@@ -1,5 +1,4 @@
-import { Dispatch, SetStateAction, useEffect } from "react";
-import GeolocationComponent from "./GeolocationComponent";
+import { useEffect } from "react";
 import uuid4 from "uuid4";
 
 const handleUserId = () => {
@@ -12,11 +11,7 @@ const handleConversationId = () => {
   localStorage.setItem("conversation_id", uuid4());
 };
 
-export const Welcome: React.FC<{
-  setGeolocationPosition: Dispatch<
-    SetStateAction<GeolocationPosition | undefined>
-  >;
-}> = ({ setGeolocationPosition }) => {
+export const Welcome: React.FC = () => {
   useEffect(() => {
     handleUserId();
     handleConversationId();
@@ -34,7 +29,6 @@ export const Welcome: React.FC<{
         Disclaimer
       </a> */}
       </p>
-      <GeolocationComponent setGeolocationPosition={setGeolocationPosition} />
     </div>
   );
 };

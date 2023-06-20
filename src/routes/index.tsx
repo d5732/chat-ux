@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { App } from "../App";
 import { useChat } from "../hooks/use-chat";
 import { ChatMessage } from "../components/ChatMessage";
@@ -8,8 +8,6 @@ import GeolocationComponent from "../components/GeolocationComponent";
 export default function Index() {
   // The content of the box where the user is typing
   const [message, setMessage] = useState<string>("");
-  const [geolocationPosition, setGeolocationPosition] =
-    useState<GeolocationPosition>();
 
   // This hook is responsible for managing the chat and communicating with the
   // backend
@@ -41,7 +39,7 @@ export default function Index() {
           <div className="flex flex-col space-y-4">
             {chatHistory.length === 0 ? (
               <>
-                <Welcome setGeolocationPosition={setGeolocationPosition} />
+                <Welcome />
                 <div className="flex justify-center">
                   <p className="text-sm text-gray-500 mt-5">
                     Built by 🤖{" "}
@@ -90,7 +88,7 @@ export default function Index() {
           </form>
         </section>
       </main>
-      <GeolocationComponent setGeolocationPosition={setGeolocationPosition} />
+      <GeolocationComponent />
     </App>
   );
 }
