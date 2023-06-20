@@ -32,6 +32,27 @@ const CustomTable: FunctionComponent<
   );
 };
 
+const CustomAnchor: FunctionComponent<
+  Omit<
+    DetailedHTMLProps<
+      React.AnchorHTMLAttributes<HTMLAnchorElement>,
+      HTMLAnchorElement
+    >,
+    "ref"
+  > &
+    ReactMarkdownProps
+> = ({ href, children }) => {
+  return (
+    <a
+      href={href}
+      className="underline"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      {children}
+    </a>
+  );
+};
 /**
  * This component renders a single chat message. It is rendered according to
  * whether it isa  message from the assistant or the user.
@@ -54,6 +75,7 @@ export const ChatMessage: React.FC<React.PropsWithChildren<Props>> = ({
           remarkPlugins={[remarkGfm]}
           components={{
             table: CustomTable,
+            a: CustomAnchor,
           }}
         />
       </div>
