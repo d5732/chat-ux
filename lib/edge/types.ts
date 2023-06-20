@@ -1,4 +1,4 @@
 export interface AppConfig {
-  REMOTE_DATABASE_API_KEY: string;
-  REMOTE_DATABASE_API_URL: string;
+  REMOTE_SERVICE_KEY: string;
+  REMOTE_SERVICE_URL: string;
 }

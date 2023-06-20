@@ -3,7 +3,7 @@ import { useState } from "react";
 import { PromptMapping, prompts } from "../../prompts/static-prompts";
 import uuid4 from "uuid4";
 
-const EDGE_API_PATH = "/api/remote-database/conversation";
+const EDGE_API_PATH = "/api/remote-service";
 type ChatMessage = {
   role: "user" | "assistant";
   content: string;
