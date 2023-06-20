@@ -142,7 +142,14 @@ export function useChat() {
       });
 
     setChatHistory((curr) => {
-      const newHistory = [...curr, ...recommendationChatMessages];
+      const newHistory = [
+        ...curr,
+        {
+          role: "assistant",
+          content: "Here are my recommendations:",
+        } as ChatMessage,
+        ...recommendationChatMessages,
+      ];
       return newHistory;
     });
   };
