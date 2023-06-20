@@ -12,7 +12,8 @@ type ChatMessage = {
 type Payload = {
   patient: {
     id: string;
-    location: null | { latitude: number; longitude: number; accuracy: number };
+    email: string;
+    location: null | { latitude: number; longitude: number };
   };
   conversation: { id: string; answers: Answers };
 };
@@ -23,8 +24,8 @@ type Answers = {
   };
 };
 
-const edgePost = async (payload: Payload) => {
-  console.log({ payload });
+const edgePost = async (payload: { payload: Payload }) => {
+  console.log(payload);
   const body = JSON.stringify(payload);
 
   // Edge API forwards requests after appending remote database API key
@@ -95,16 +96,20 @@ export function useChat() {
           answers: reduceChatHistoryToAnswers(chatHistory),
         };
 
+        console.log({ conversation });
         const payload: Payload = {
           conversation,
           patient: {
-            id: localStorage.getItem("userId") || uuid4(), location: {
-              latitude: Number(localStorage.getItem("latitude")),
-              longitude: Number(localStorage.getItem("longitude")),
-          } },
+            id: localStorage.getItem("userId") || uuid4(),
+            email: "abc@def.com",
+            location: {
+              latitude: Number(localStorage.getItem("location.latitude")),
+              longitude: Number(localStorage.getItem("location.longitude")),
+            },
+          },
         };
         setCompleted(true);
-        edgePost(payload);
+        edgePost({ payload });
       } else {
         newHistory.push({
           role: "assistant",
